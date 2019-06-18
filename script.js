@@ -28,7 +28,6 @@ function constituent(value, keys) {
   return obj;
 }
 
-//Equal of SET///////////////////////////
 function isEqual(a, b) {
   const a1 = setToArray(a);
   const a2 = setToArray(b);
@@ -38,24 +37,20 @@ function isEqual(a, b) {
 function setToArray(setInstance) {
   return Array.from(setInstance).sort((a, b) => b - a);
 }
-///////////////////////////////////////////
 
 const functions = [];
 let ddnf = [];
 function calculate(n, countFunc, inversion) {
-  //find all functions value
+ 
 
   for (let i = 0; i < countFunc; i++) {
     const func = document.getElementsByClassName('value' + i);
     const arr = [];
     for (let k = 0; k < func.length; k++) {
-      //arr.push(func[k].value.replace("-","1"));
       arr.push(func[k].value);
     }
     functions.push(arr);
   }
-
-  //find all constituent
 
   for (let i = 0; i < functions[0].length; i++) {
     const keys = [];
@@ -70,7 +65,6 @@ function calculate(n, countFunc, inversion) {
   }
   console.log('10'[+inversion]);
   console.log(ddnf);
-  //try find sdnf
   const sdnf = minimization(ddnf);
   const resstring = [];
   for (let i = 0; i < sdnf.length; i++) {
@@ -118,12 +112,12 @@ function coverage_table(implicants, constituents, countFunc) {
   for (let i = 1; i <= countFunc; i++) {
     for (let k = 0; k < constituents.length; k++) {
       if (constituents[k].keys.has(i)) {
-        content += '<th>' + constituents[k].value + '{' + i + '}' + '</th>';
+        content.push('<th>',constituents[k].value,'{',i,'}','</th>');
         head.push(constituent(constituents[k].value, [i]));
       }
     }
   }
-  content += '</tr>';
+  content.push('</tr>');
 
   const matrix = [];
   for (let i = 0; i < implicants.length; i++) {
@@ -157,7 +151,6 @@ function coverage_table(implicants, constituents, countFunc) {
     const val = implicants[i].value;
     const listOfKeys = [...implicants[i].keys].join(',');
     content.push('<th>', val, '{', listOfKeys, '}</th>');
-    // content += '<th>' + implicants[i].value + '{' + [...implicants[i].keys].join(',') + '}</th>';
     for (let k = 0; k < matrix[i].length; k++) {
       if (matrix[i][k] === 2) {
         content.push('<th class=\'yellow\'>+</th>');
@@ -169,7 +162,7 @@ function coverage_table(implicants, constituents, countFunc) {
     content.push('</tr>');
   }
 
-  return '<table style=\'margin: 0 auto;\'>' + [...content] + '</table>';
+  return '<table style=\'margin: 0 auto;\'>' + content.join('') + '</table>';
 }
 
 function similar(string1, string2) {
@@ -210,29 +203,19 @@ function unique(arr) {
     }
   }
   return res;
-}
-
-/*
-  test();
-  function test(){
-    console.log(unique([constituent("001",new Set([0,1])),constituent("001",new Set([0,1]))]));
-  }
-*/
+};
 
 function minimization(ddnf) {
-  //console.log(ddnf);
   const massege = [];
   for (let i = 0; i < ddnf.length; i++) {
     massege.push(ddnf[i].value + '{' + [...ddnf[i].keys].join(',') + '}');
   }
-  //alert(massege.join("\n"));
   let arr = [];
   const opt = [];
   for (let i = 0; i < ddnf.length; i++) { opt.push(0); }
 
   for (let i = 0; i < ddnf.length; i++) {
     for (let k = i + 1; k < ddnf.length; k++) {
-      //alert("st1 = " + ddnf[i].value + "\nst2 = " + ddnf[k].value);
       const res = similar(ddnf[i].value, ddnf[k].value);
       const nosimilar = res[0];
       const st = res[1];
@@ -241,26 +224,18 @@ function minimization(ddnf) {
       if (nosimilar === 1 && keys.size !== 0) {
 
         arr.push(constituent(st, keys));
-        /*
-        console.log(keys);
-        console.log(keys.size);
-        console.log(ddnf[i].keys);
-        console.log(ddnf[k].keys);
-        */
         if (isEqual(ddnf[i].keys, keys)) {
-          //console.log("Del i : " + i.toString());
           opt[i] = 1;
         }
         if (isEqual(ddnf[k].keys, keys)) {
-          //console.log("Del k : " + k.toString());
           opt[k] = 1;
         }
       }
     }
   }
-  //console.log(opt);
+  
   arr = unique(arr);
-  //console.log(arr);
+  
   let next_ddnf = null;
   if (arr.length !== 0) {
     if (count(arr[0].value, 'X') !== arr[0].value.length - 1) {
@@ -269,23 +244,16 @@ function minimization(ddnf) {
       const arr_remove = [];
       for (let i = 0; i < arr.length; i++) {
         for (let k = i + 1; k < arr.length; k++) {
-          /*
-            for(var j=0;j<arr[i].value.length;j++){
-              if(arr[i].value[j] != "X" && arr[i].value[j] == arr[k].value[j]) {
-                remove.push(arr[i]);
-                remove.push(arr[k]);
-              }
-            }
-            */
           const iVal = arr[i].value;
           const kVal = arr[k].value;
-          if (iVal === kVal && (arr[i].keys.forEach(key => arr[k].keys.has(key)) || (arr[k].keys.forEach(key => arr[i].keys.has(key))))) {
+          const compare = (arr[i].keys.forEach(key => arr[k].keys.has(key));
+          if (iVal === kVal &&  || compare ||
+          (arr[k].keys.forEach(key => arr[i].keys.has(key)))) {
             arr_remove.push(arr[i]);
             arr_remove.push(arr[k]);
           }
         }
       }
-      //console.log(arr);
       arr = unique(arr.filter(x => !arr_remove.includes(x)));
       next_ddnf = arr;
     }
